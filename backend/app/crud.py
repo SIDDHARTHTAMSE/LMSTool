@@ -4,7 +4,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate
+from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, SignUpCreate
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -52,3 +52,23 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: uuid.UUID) -
     session.commit()
     session.refresh(db_item)
     return db_item
+
+
+def get_email_by_signup(*, session: Session, email: str) -> SignUpCreate | None:
+    query = select(SignUpCreate).where(SignUpCreate.email == email)
+    email = session.exec(query).one_or_none()
+    return email
+
+
+def create_signup(session: Session, signup: SignUpCreate):
+    session.add(signup)
+    session.commit()
+    session.refresh(signup)
+    return signup
+
+
+def authenticate_user(*, session: Session, email: str, password: str) -> SignUpCreate | None:
+    user = get_email_by_signup(session=session, email=email)
+    if user and user.password == password:
+        return user
+    return None
