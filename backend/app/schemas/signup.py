@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from app.models import SignUpCreate
+from app.models import UserProfile
 
 
 class CreateSignUp(BaseModel):
@@ -15,7 +15,7 @@ class CreateSignUpRes(BaseModel):
     password: str
 
 
-def to_signup_res(signup: SignUpCreate):
+def to_signup_res(signup: UserProfile):
     return CreateSignUpRes(
         full_name=signup.full_name,
         email=signup.email,

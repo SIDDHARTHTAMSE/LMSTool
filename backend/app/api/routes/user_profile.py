@@ -1,42 +1,44 @@
 from fastapi import APIRouter, HTTPException
-from app.crud import get_email_by_signup, create_signup
+from app.crud import user_profile_crud
 from app.schemas.signup import CreateSignUp, CreateSignUpRes, to_signup_res
 from app.schemas.signin import SigninRequest
 from app.api.deps import SessionDep
 from fastapi import status
-from app.models import SignUpCreate
+from app.models import UserProfile
 from fastapi.responses import JSONResponse
 
 
 router = APIRouter()
 
 
-@router.post("/signup", response_model=CreateSignUpRes)
+@router.post("/sign_up", response_model=CreateSignUpRes)
 def create_by_signup(session: SessionDep, signup_req: CreateSignUp):
-    existing_email = get_email_by_signup(
+    existing_user_profile = user_profile_crud.get_user_profile_by_email(
         session=session, email=signup_req.email
     )
 
-    if existing_email:
+    if existing_user_profile:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Email id already exist"
+            detail="User Profile by given Email ID already exist"
         )
 
-    signup = SignUpCreate()
-    signup.full_name = signup_req.full_name
-    signup.email = signup_req.email
-    signup.password = signup_req.password
-    signup = create_signup(session=session, signup=signup)
+    new_user = UserProfile()
+    new_user.full_name = signup_req.full_name
+    new_user.email = signup_req.email
+    new_user.password = signup_req.password
+    new_user = user_profile_crud.create_user_profile(session=session, user=new_user)
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
-        content=to_signup_res(signup)
+        content=to_signup_res(new_user)
     )
 
 
-@router.post("/signin")
+@router.post("/sign_in")
 def sign_in(session: SessionDep, signin_req: SigninRequest):
-    user = get_email_by_signup(session=session, email=signin_req.email)
+    user = user_profile_crud.get_user_profile_by_email(
+        session=session, email=signin_req.email
+    )
 
     if not user:
         raise HTTPException(
@@ -52,5 +54,5 @@ def sign_in(session: SessionDep, signin_req: SigninRequest):
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content="Successfully signin"
+        content="Successfully signed in"
     )

@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from app.models import SignUpCreate
+from app.models import UserProfile
 
 
 class SigninRequest(BaseModel):
@@ -13,7 +13,7 @@ class SigninResponse(BaseModel):
     password: str
 
 
-def to_signin_res(signin: SignUpCreate):
+def to_signin_res(signin: UserProfile):
     return SigninResponse(
         email=signin.email,
         password=signin.password

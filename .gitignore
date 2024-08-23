@@ -4,3 +4,10 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+.idea/dbnavigator.xml
+.idea/LMSTool.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml

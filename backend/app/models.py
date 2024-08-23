@@ -114,7 +114,7 @@ class NewPassword(SQLModel):
     new_password: str = Field(min_length=8, max_length=40)
 
 
-class SignUpCreate(SQLModel, table=True):
+class UserProfile(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     full_name: str = Field(max_length=64)
     email: EmailStr = Field(unique=True, index=True, max_length=64)

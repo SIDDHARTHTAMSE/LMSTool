@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException
-from app.crud import create_contact_message, get_contact_message
-from app.schemas.contactus import ContactMessageRequest, ContactMessageResponse, to_contact_res
-from app.api.deps import SessionDep
-from fastapi import status
-from app.models import ContactMessage
-from fastapi.responses import JSONResponse
 from typing import List
 
+from fastapi import APIRouter
+from fastapi import status
+from fastapi.responses import JSONResponse
+
+from app.api.deps import SessionDep
+from app.crud.user_item_crud import create_contact_message, get_contact_message
+from app.models import ContactMessage
+from app.schemas.contactus import ContactMessageRequest, ContactMessageResponse, to_contact_res
 
 router = APIRouter()
 
