@@ -4,7 +4,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, SignUpCreate
+from app.models import Item, ItemCreate, User, UserCreate, UserUpdate, SignUpCreate, ContactMessage
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -72,3 +72,16 @@ def authenticate_user(*, session: Session, email: str, password: str) -> SignUpC
     if user and user.password == password:
         return user
     return None
+
+
+def create_contact_message(session: Session, contact_message: ContactMessage) -> ContactMessage:
+    session.add(contact_message)
+    session.commit()
+    session.refresh(contact_message)
+    return contact_message
+
+
+def get_contact_message(session: Session):
+    query = select(ContactMessage)
+    message = session.exec(query).all()
+    return message
