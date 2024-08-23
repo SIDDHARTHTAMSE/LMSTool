@@ -36,12 +36,18 @@ def create_by_signup(session: SessionDep, signup_req: CreateSignUp):
 
 @router.post("/signin")
 def sign_in(session: SessionDep, signin_req: SigninRequest):
-    user = authenticate_user(session=session, email=signin_req.email, password=signin_req.password)
+    user = get_email_by_signup(session=session, email=signin_req.email)
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password"
+            detail="Invalid email"
+        )
+
+    if user.password != signin_req.password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Password"
         )
 
     return JSONResponse(
