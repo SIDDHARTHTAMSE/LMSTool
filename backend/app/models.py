@@ -117,6 +117,7 @@ class NewPassword(SQLModel):
 class UserProfile(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     full_name: str = Field(max_length=64)
+    first_name: str = Field(max_length=64, nullable=True)
     last_name: str = Field(max_length=64, nullable=True)
     email: EmailStr = Field(unique=True, index=True, max_length=64)
     phone_number: str = Field(max_length=16, nullable=True)

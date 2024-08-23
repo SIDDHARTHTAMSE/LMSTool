@@ -61,7 +61,7 @@ def create_contact_message(session: Session, contact_message: ContactMessage) ->
     return contact_message
 
 
-def get_contact_message(session: Session):
+def get_contact_messages(session: Session):
     query = select(ContactMessage)
     message = session.exec(query).all()
     return message
