@@ -117,14 +117,15 @@ class NewPassword(SQLModel):
 class UserProfile(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     full_name: str = Field(max_length=64)
+    last_name: str = Field(max_length=64, nullable=True)
     email: EmailStr = Field(unique=True, index=True, max_length=64)
+    phone_number: str = Field(max_length=16, nullable=True)
     password: str = Field(min_length=8, max_length=32)
 
 
 class ContactMessage(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    first_name: str = Field(max_length=64)
-    last_name: str = Field(max_length=64)
-    email: EmailStr = Field(index=True, max_length=32)
-    phone_number: str = Field(max_length=16)
     message: str = Field(max_length=500)
+    user_profile_id: uuid.UUID = Field(
+        foreign_key="userprofile.id", nullable=False
+    )
