@@ -25,6 +25,9 @@ def create_by_signup(session: SessionDep, signup_req: CreateSignUp):
 
     new_user = UserProfile()
     new_user.full_name = signup_req.full_name
+    new_user.first_name = signup_req.first_name
+    new_user.last_name = signup_req.last_name
+    new_user.phone_number = str(signup_req.phone_number)
     new_user.email = signup_req.email
     new_user.password = signup_req.password
     new_user = user_profile_crud.create_user_profile(session=session, user=new_user)
