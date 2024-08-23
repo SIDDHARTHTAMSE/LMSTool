@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from app.crud import get_email_by_signup, create_signup, authenticate_user
+from app.crud import get_email_by_signup, create_signup
 from app.schemas.signup import CreateSignUp, CreateSignUpRes, to_signup_res
-from app.schemas.signin import SigninRequest, SigninResponse, to_signin_res
+from app.schemas.signin import SigninRequest
 from app.api.deps import SessionDep
 from fastapi import status
 from app.models import SignUpCreate
