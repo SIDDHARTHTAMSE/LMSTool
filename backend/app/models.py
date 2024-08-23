@@ -119,3 +119,12 @@ class SignUpCreate(SQLModel, table=True):
     full_name: str = Field(max_length=64)
     email: EmailStr = Field(unique=True, index=True, max_length=64)
     password: str = Field(min_length=8, max_length=32)
+
+
+class ContactMessage(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    first_name: str = Field(max_length=64)
+    last_name: str = Field(max_length=64)
+    email: EmailStr = Field(index=True, max_length=32)
+    phone_number: str = Field(max_length=16)
+    message: str = Field(max_length=500)
