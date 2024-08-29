@@ -1,7 +1,7 @@
 import uuid
 
 from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship, SQLModel, Column, ForeignKey
 
 
 # Shared properties
@@ -122,11 +122,15 @@ class UserProfile(SQLModel, table=True):
     email: EmailStr = Field(unique=True, index=True, max_length=64)
     phone_number: str = Field(max_length=16, nullable=True)
     password: str = Field(min_length=8, max_length=32)
+    contact_messages: list["ContactMessage"] = Relationship(
+        back_populates="user_profile", sa_relationship_kwargs={"cascade": "all, delete"}
+    )
 
 
 class ContactMessage(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     message: str = Field(max_length=500)
     user_profile_id: uuid.UUID = Field(
-        foreign_key="userprofile.id", nullable=False
+        sa_column=Column(ForeignKey("userprofile.id", ondelete="CASCADE"), nullable=False)
     )
+    user_profile: "UserProfile" = Relationship(back_populates="contact_messages")
