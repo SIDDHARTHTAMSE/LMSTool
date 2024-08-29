@@ -23,6 +23,18 @@ def create_user_profile(session: Session, user: UserProfile):
     return user
 
 
+def delete_by_user(session: Session, user: UserProfile):
+    session.delete(user)
+    session.commit()
+
+
+def update_user_profile(session: Session, user: UserProfile):
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return user
+
+
 def authenticate_user(*, session: Session, email: str, password: str) -> UserProfile | None:
     user = get_user_profile_by_email(session=session, email=email)
     if user and user.password == password:
