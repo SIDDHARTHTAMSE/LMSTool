@@ -9,13 +9,22 @@ class CreateSignUp(BaseModel):
     full_name: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    phone_number: Optional[int] = None
+    phone_number: Optional[str] = None
     email: str
     password: str
 
 
 class CreateSignUpRes(CreateSignUp):
     pass
+
+
+class UpdateUserProfile(BaseModel):
+    full_name: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
 
 
 def to_signup_res(signup: UserProfile):
