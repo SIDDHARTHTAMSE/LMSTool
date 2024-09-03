@@ -1,7 +1,11 @@
+from datetime import datetime
+
+from sqlalchemy import Time, JSON
 import uuid
 
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel, Column, ForeignKey
+from typing import List, Dict, Optional
 
 
 # Shared properties
@@ -134,3 +138,58 @@ class ContactMessage(SQLModel, table=True):
         sa_column=Column(ForeignKey("userprofile.id", ondelete="CASCADE"), nullable=False)
     )
     user_profile: "UserProfile" = Relationship(back_populates="contact_messages")
+
+
+class Course(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    course_name: str = Field(max_length=128, nullable=False)
+    description: Optional[str] = Field(max_length=255, nullable=True)
+    price: float = Field(gt=0, nullable=False)
+    thumbnail_url: Optional[str] = Field(nullable=True)
+    rating: Optional[float] = Field(default=None, ge=0, le=5, nullable=True)
+    categories: Optional[List[str]] = Field(default=None, sa_column=Column(JSON))
+    content: Optional[List[Dict[str, str]]] = Field(default=None, sa_column=Column(JSON))
+    duration: Optional[int] = Field(nullable=True)
+    level: Optional[str] = Field(default=None)
+    released_date: Optional[datetime] = Field(default=None, nullable=True)
+    last_update: Optional[datetime] = Field(default_factory=datetime.utcnow, nullable=True)
+    enrollment_count: int = Field(default=0)
+    certification: bool = Field(default=False)
+    discount_offers: Optional[str] = Field(max_length=255, nullable=True)
+    syllabus: Optional[str] = Field(max_length=2000, nullable=True)
+    progress_tracking: bool = Field(default=False)
+    course_resource: Optional[str] = Field(max_length=500, nullable=True)
+    faqs: Optional[str] = Field(max_length=2000, nullable=True)
+    accessibility_features: Optional[str] = Field(max_length=255, nullable=True)
+    course_preview: Optional[str] = Field(nullable=True)
+    interactive_features: Optional[str] = Field(max_length=255, nullable=True)
+    video_quality_option: Optional[str] = Field(max_length=255, nullable=True)
+
+    authors: List["CourseAuthorLink"] = Relationship(back_populates="course")
+
+
+class Author(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    name: str = Field(max_length=64, nullable=False)
+    bio: Optional[str] = Field(max_length=256, nullable=True)
+    email: Optional[EmailStr] = Field(max_length=256, nullable=True)
+    website: Optional[str] = Field(max_length=256, nullable=True)
+    expertise: Optional[List[str]] = Field(default=None, sa_column=Column(JSON))
+    qualification: Optional[str] = Field(max_length=256, nullable=True)
+    experience_years: Optional[int] = Field(nullable=True)
+    certifications: Optional[List[str]] = Field(default=None, sa_column=Column(JSON))
+    location: Optional[str] = Field(max_length=32, nullable=True)
+    languages: Optional[str] = Field(default=None, sa_column=Column(JSON))
+    contact_number: Optional[str] = Field(max_length=12, nullable=True)
+    join_date: Optional[datetime] = Field(default_factory=datetime.utcnow, nullable=True)
+    last_active: Optional[datetime] = Field(nullable=True)
+
+    courses: List["CourseAuthorLink"] = Relationship(back_populates="author")
+
+
+class CourseAuthorLink(SQLModel, table=True):
+    course_id: uuid.UUID = Field(foreign_key="course.id", primary_key=True)
+    author_id: uuid.UUID = Field(foreign_key="author.id", primary_key=True)
+
+    course: Course = Relationship(back_populates="authors")
+    author: Author = Relationship(back_populates="courses")
