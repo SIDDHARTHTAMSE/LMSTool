@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Time, JSON
 import uuid
 
-from pydantic import EmailStr
+from pydantic import EmailStr, condecimal
 from sqlmodel import Field, Relationship, SQLModel, Column, ForeignKey
 from typing import List, Dict, Optional
 
@@ -144,7 +144,6 @@ class Course(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     course_name: str = Field(max_length=128, nullable=False)
     description: Optional[str] = Field(max_length=255, nullable=True)
-    price: float = Field(gt=0, nullable=False)
     thumbnail_url: Optional[str] = Field(nullable=True)
     rating: Optional[float] = Field(default=None, ge=0, le=5, nullable=True)
     categories: Optional[List[str]] = Field(default=None, sa_column=Column(JSON))
@@ -164,8 +163,8 @@ class Course(SQLModel, table=True):
     course_preview: Optional[str] = Field(nullable=True)
     interactive_features: Optional[str] = Field(max_length=255, nullable=True)
     video_quality_option: Optional[str] = Field(max_length=255, nullable=True)
-
     authors: List["CourseAuthorLink"] = Relationship(back_populates="course")
+    prices: List["Price"] = Relationship(back_populates="course")
 
 
 class Author(SQLModel, table=True):
@@ -179,12 +178,25 @@ class Author(SQLModel, table=True):
     experience_years: Optional[int] = Field(nullable=True)
     certifications: Optional[List[str]] = Field(default=None, sa_column=Column(JSON))
     location: Optional[str] = Field(max_length=32, nullable=True)
-    languages: Optional[str] = Field(default=None, sa_column=Column(JSON))
+    languages: Optional[List[str]] = Field(default=None, sa_column=Column(JSON))
     contact_number: Optional[str] = Field(max_length=12, nullable=True)
     join_date: Optional[datetime] = Field(default_factory=datetime.utcnow, nullable=True)
     last_active: Optional[datetime] = Field(nullable=True)
 
     courses: List["CourseAuthorLink"] = Relationship(back_populates="author")
+
+
+class Price(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    amount: condecimal(gt=0) = Field(nullable=False)
+    currency: str = Field(max_length=3, nullable=False, default="USD")
+    discount: Optional[str] = Field(ge=0, le=100, nullable=True)
+    start_date: Optional[datetime] = Field(default=None, nullable=True)
+    end_date: Optional[datetime] = Field(default=None, nullable=True)
+    description: Optional[str] = Field(max_length=255, nullable=True)
+
+    course_id: uuid.UUID = Field(foreign_key="course.id")
+    course: Course = Relationship(back_populates="prices")
 
 
 class CourseAuthorLink(SQLModel, table=True):
