@@ -129,6 +129,7 @@ class UserProfile(SQLModel, table=True):
     contact_messages: list["ContactMessage"] = Relationship(
         back_populates="user_profile", sa_relationship_kwargs={"cascade": "all, delete"}
     )
+    courses: List["UserEnrollment"] = Relationship(back_populates="user")
 
 
 class ContactMessage(SQLModel, table=True):
@@ -163,8 +164,12 @@ class Course(SQLModel, table=True):
     course_preview: Optional[str] = Field(nullable=True)
     interactive_features: Optional[str] = Field(max_length=255, nullable=True)
     video_quality_option: Optional[str] = Field(max_length=255, nullable=True)
+
     authors: List["CourseAuthorLink"] = Relationship(back_populates="course")
     prices: List["Price"] = Relationship(back_populates="course")
+    chapters: List["CourseChapter"] = Relationship(back_populates="course")
+    thumbnail: List["Thumbnail"] = Relationship(back_populates="course")
+    enrollments: List["UserEnrollment"] = Relationship(back_populates="course")
 
 
 class Author(SQLModel, table=True):
@@ -205,3 +210,33 @@ class CourseAuthorLink(SQLModel, table=True):
 
     course: Course = Relationship(back_populates="authors")
     author: Author = Relationship(back_populates="courses")
+
+
+class CourseChapter(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    title: str = Field(max_length=128, nullable=False)
+    content: Optional[str] = Field(nullable=True)
+    order: Optional[str] = Field(nullable=True)
+
+    course_id: uuid.UUID = Field(foreign_key="course.id")
+    course: Course = Relationship(back_populates="chapters")
+
+
+class Thumbnail(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    url: str = Field(max_length=255, nullable=False)
+    description: Optional[str] = Field(max_length=255, nullable=True)
+    uploaded_date: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+
+    thumbnail_id: uuid.UUID = Field(foreign_key="course.id")
+    course: Course = Relationship(back_populates="thumbnail")
+
+
+class UserEnrollment(SQLModel, table=True):
+    user_id: uuid.UUID = Field(foreign_key="userprofile.id", primary_key=True)
+    course_id: uuid.UUID = Field(foreign_key="course.id", primary_key=True)
+    enrollment_date: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    status: Optional[str] = Field(max_length=64, nullable=True)
+
+    user: UserProfile = Relationship(back_populates="courses")
+    course: Course = Relationship(back_populates="enrollments")
