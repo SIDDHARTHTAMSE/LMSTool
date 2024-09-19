@@ -1,5 +1,6 @@
-from datetime import datetime
+from __future__ import annotations
 
+from datetime import datetime
 from sqlalchemy import Time, JSON
 import uuid
 
@@ -170,6 +171,7 @@ class Course(SQLModel, table=True):
     chapters: List["CourseChapter"] = Relationship(back_populates="course")
     thumbnail: List["Thumbnail"] = Relationship(back_populates="course")
     enrollments: List["UserEnrollment"] = Relationship(back_populates="course")
+    resources: List["CourseResource"] = Relationship(back_populates="course")
 
 
 class Author(SQLModel, table=True):
@@ -221,6 +223,8 @@ class CourseChapter(SQLModel, table=True):
     course_id: uuid.UUID = Field(foreign_key="course.id")
     course: Course = Relationship(back_populates="chapters")
 
+    resources: List["CourseResource"] = Relationship(back_populates="chapter")
+
 
 class Thumbnail(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -240,3 +244,25 @@ class UserEnrollment(SQLModel, table=True):
 
     user: UserProfile = Relationship(back_populates="courses")
     course: Course = Relationship(back_populates="enrollments")
+
+
+class CourseResource(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    title: str = Field(max_length=128, nullable=False)
+    resource_url: Optional[str] = Field(nullable=True)
+
+    course_id: uuid.UUID = Field(foreign_key="course.id", nullable=False)
+    chapter_id: uuid.UUID = Field(foreign_key="coursechapter.id", nullable=False)
+    resource_type_id: uuid.UUID = Field(foreign_key="resourcetype.id", nullable=False)
+
+    course: Course = Relationship(back_populates="resources")
+    chapter: CourseChapter = Relationship(back_populates="resources")
+    resource_type: ResourceType = Relationship(back_populates="resources")
+
+
+class ResourceType(SQLModel, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    type_name: str = Field(max_length=64, nullable=False)
+    description: Optional[str] = Field(nullable=True)
+
+    resources: List["CourseResource"] = Relationship(back_populates="resource_type")
