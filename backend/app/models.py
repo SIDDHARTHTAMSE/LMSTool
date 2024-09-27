@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 from datetime import datetime
 from sqlalchemy import Time, JSON
@@ -48,7 +47,9 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
+    items: list["Item"] | None = Relationship(
+        back_populates="owner", cascade_delete=True
+    )
 
 
 # Properties to return via API, id is always required
@@ -257,12 +258,11 @@ class CourseResource(SQLModel, table=True):
 
     course: Course = Relationship(back_populates="resources")
     chapter: CourseChapter = Relationship(back_populates="resources")
-    resource_type: ResourceType = Relationship(back_populates="resources")
+    # resource_type: ResourceType = Relationship(back_populates="resources")
 
 
 class ResourceType(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     type_name: str = Field(max_length=64, nullable=False)
     description: Optional[str] = Field(nullable=True)
-
-    resources: List["CourseResource"] = Relationship(back_populates="resource_type")
+    # resources: List["CourseResource"] = Relationship(back_populates="resource_type")
