@@ -122,12 +122,12 @@ class NewPassword(SQLModel):
 
 class UserProfile(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    full_name: str = Field(max_length=64)
+    full_name: str = Field(max_length=64, nullable=False)
     first_name: str = Field(max_length=64, nullable=True)
     last_name: str = Field(max_length=64, nullable=True)
-    email: EmailStr = Field(unique=True, index=True, max_length=64)
+    email: EmailStr = Field(unique=True, index=True, max_length=64, nullable=False)
     phone_number: str = Field(max_length=16, nullable=True)
-    password: str = Field(min_length=8, max_length=32)
+    password: str = Field(min_length=8, max_length=32, nullable=False)
     contact_messages: list["ContactMessage"] = Relationship(
         back_populates="user_profile", sa_relationship_kwargs={"cascade": "all, delete"}
     )
