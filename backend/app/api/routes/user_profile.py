@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from app.crud import user_profile_crud
 from app.schemas.signup import CreateSignUp, CreateSignUpRes, to_signup_res, UpdateUserProfile
-from app.schemas.signin import SigninRequest
+from app.schemas.signin import SigninRequest, SigninResponse, to_signin_res
 from app.api.deps import SessionDep
 from app.models import UserProfile
 from fastapi.responses import JSONResponse
@@ -59,7 +59,7 @@ def create_by_signup(session: SessionDep, signup_req: CreateSignUp):
     )
 
 
-@router.post("/sign_in")
+@router.post("/sign_in", response_model=SigninResponse)
 def sign_in(session: SessionDep, signin_req: SigninRequest):
     signin_req.email = signin_req.email.strip()
     signin_req.password = signin_req.password.strip()
@@ -94,7 +94,7 @@ def sign_in(session: SessionDep, signin_req: SigninRequest):
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content="Successfully signed in"
+        content=to_signin_res(user)
     )
 
 
