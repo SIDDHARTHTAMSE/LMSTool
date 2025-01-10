@@ -1,0 +1,269 @@
+@startuml
+entity "Course" as course {
+    +id: UUID [PK]
+    +course_name: String
+    +description: String
+    +thumbnail_id: UUID [FK]
+    +rating: Float
+    +categories: JSON
+    +content: JSON
+    +duration: Integer
+    +level: String
+    +released_date: DateTime
+    +last_update: DateTime
+    +enrollment_count: Integer
+    +certification: Boolean
+    +discount_offers: String
+    +syllabus: String
+    +progress_tracking: Boolean
+    +course_resource: String
+    +faqs: String
+    +accessibility_features: String
+    +course_preview: String
+    +interactive_features: String
+    +video_quality_option: String
+}
+
+entity "Thumbnail" as thumbnail {
+    +id: UUID [PK]
+    +url: String
+    +description: String
+    +uploaded_date: DateTime
+}
+
+entity "Author" as author {
+    +id: UUID [PK]
+    +name: String
+    +bio: String
+    +email: String
+    +website: String
+    +expertise: JSON
+    +qualification: String
+    +experience_years: Integer
+    +certifications: JSON
+    +location: String
+    +languages: JSON
+    +contact_number: String
+    +join_date: DateTime
+    +last_active: DateTime
+}
+
+entity "Price" as price {
+    +id: UUID [PK]
+    +amount: Decimal
+    +currency: String
+    +discount: Float
+    +start_date: DateTime
+    +end_date: DateTime
+    +description: String
+}
+
+entity "CourseAuthorLink" as course_author_link {
+    +course_id: UUID [FK]
+    +author_id: UUID [FK]
+}
+
+entity "CourseChapter" as course_chapter {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +chapter_title: String
+    +content: String
+    +order: Integer
+}
+
+entity "Enrollment" as enrollment {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +user_id: UUID [FK]
+    +enrollment_date: DateTime
+    +status: String
+}
+
+entity "Review" as review {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +user_id: UUID [FK]
+    +rating: Float
+    +comment: String
+    +review_date: DateTime
+}
+
+entity "CourseResource" as course_resource {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +chapter_id: UUID [FK]
+    +title: String
+    +resource_url: String
+    +resource_type_id: UUID [FK]
+}
+
+entity "ResourceType" as resource_type {
+    +id: UUID [PK]
+    +type_name: String
+    +description: String
+}
+
+entity "User" as user {
+    +id: UUID [PK]
+    +name: String
+    +email: String
+    +password: String
+}
+
+entity "Category" as category {
+    +id: UUID [PK]
+    +name: String
+    +description: String
+    +created_at: DateTime
+    +updated_at: DateTime
+    +is_active: Boolean
+}
+
+entity "CourseCategoryLink" as course_category_link {
+    +course_id: UUID [FK]
+    +category_id: UUID [FK]
+}
+
+entity "Quiz" as quiz {
+    +id: UUID [PK]
+    +title: String
+    +description: String
+    +course_id: UUID [FK]
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+entity "QuizQuestion" as quiz_question {
+    +id: UUID [PK]
+    +quiz_id: UUID [FK]
+    +question_text: String
+    +options: JSON
+    +correct_answer: String
+}
+
+entity "CourseModule" as course_module {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +title: String
+    +description: String
+}
+
+entity "CourseLesson" as course_lesson {
+    +id: UUID [PK]
+    +module_id: UUID [FK]
+    +title: String
+    +description: String
+}
+
+entity "ContentItem" as content_item {
+    +id: UUID [PK]
+    +lesson_id: UUID [FK]
+    +content_type: String
+    +content_url: Optional[String]
+    +description: Optional[String]
+}
+
+entity "Student" as student {
+    +id: UUID [PK]
+    +user_id: UUID [FK]
+    +enrolled_date: DateTime
+    +progress: Float
+    +completed: Boolean
+}
+
+entity "Certification" as certification {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +user_id: UUID [FK]
+    +certification_date: DateTime
+    +grade: String
+}
+
+entity "Progress" as progress {
+    +id: UUID [PK]
+    +user_id: UUID [FK]
+    +course_id: UUID [FK]
+    +module_id: UUID [FK]
+    +lesson_id: UUID [FK]
+    +progress_percentage: Float
+    +last_accessed: DateTime
+}
+
+entity "Analytics" as analytics {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +user_id: UUID [FK]
+    +hours_watched: Integer
+    +modules_completed: Integer
+    +last_activity_date: DateTime
+}
+
+entity "CourseSyllabus" as course_syllabus {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +syllabus_title: String
+    +syllabus_description: String
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+entity "CourseDiscountOffer" as course_discount_offer {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +offer_title: String
+    +discount_percentage: Float
+    +start_date: DateTime
+    +end_date: DateTime
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+entity "CourseReleaseDate" as course_release_date {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +release_date: DateTime
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+entity "CourseFAQs" as course_faqs {
+    +id: UUID [PK]
+    +course_id: UUID [FK]
+    +question: String
+    +answer: String
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+' Relationships
+course -- thumbnail : "has thumbnail"
+course "1" -- "0..*" course_chapter : "contains"
+course "1" -- "0..*" enrollment : "has"
+course "1" -- "0..*" review : "receives"
+course "1" -- "0..*" course_resource : "includes"
+course "0..*" -- "0..*" price : "offers"
+course_author_link -- course : "links to"
+course_author_link -- author : "taught by"
+enrollment -- user : "linked to"
+review -- user : "written by"
+course_resource -- course_chapter : "associated with"
+course "1" -- "0..*" course_category_link : "includes"
+category "1" -- "0..*" course_category_link : "linked to"
+course "1" -- "0..*" quiz : "includes"
+quiz "1" -- "0..*" quiz_question : "contains"
+course "1" -- "0..*" course_module : "includes"
+course_module "1" -- "0..*" course_lesson : "contains"
+course_lesson "1" -- "0..*" content_item : "includes"
+course_resource -- resource_type : "has resource type"
+course "1" -- "0..*" certification : "awards"
+student -- course : "enrolled in"
+student "1" -- "0..*" progress : "tracks"
+student "1" -- "0..*" certification : "awarded"
+progress -- course_module : "related to module"
+progress -- course_lesson : "related to lesson"
+course "1" -- "0..*" analytics : "generates"
+course "1" -- "0..*" course_syllabus : "contains"
+course "1" -- "0..*" course_discount_offer : "has"
+course "1" -- "0..*" course_release_date : "released on"
+course -- course_faqs : "has FAQs"
+@enduml
