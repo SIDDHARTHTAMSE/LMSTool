@@ -5,6 +5,10 @@ from sqlmodel import Session, select
 from app.models import UserProfile
 
 
+def get_all_users(session: Session):
+    return session.exec(select(UserProfile)).all()
+
+
 def get_user_profile_by_email(*, session: Session, email: str) -> UserProfile | None:
     query = select(UserProfile).where(UserProfile.email == email)
     user_profile = session.exec(query).one_or_none()
