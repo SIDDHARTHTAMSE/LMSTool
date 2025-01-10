@@ -1,10 +1,11 @@
 from fastapi import APIRouter, HTTPException, status
 from app.crud import user_profile_crud
 from app.schemas.signup import CreateSignUp, CreateSignUpRes, to_signup_res, UpdateUserProfile
-from app.schemas.signin import SigninRequest
+from app.schemas.signin import SigninRequest, SigninResponse, to_signin_res
 from app.api.deps import SessionDep
 from app.models import UserProfile
 from fastapi.responses import JSONResponse
+from typing import List
 
 router = APIRouter()
 
@@ -21,6 +22,11 @@ def create_by_signup(session: SessionDep, signup_req: CreateSignUp):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Full name must not be null"
+        )
+    if not signup_req.email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email must not be null"
         )
     if not signup_req.email or "@" not in signup_req.email or not signup_req.email.endswith('gmail.com'):
         raise HTTPException(
@@ -59,7 +65,13 @@ def create_by_signup(session: SessionDep, signup_req: CreateSignUp):
     )
 
 
-@router.post("/sign_in")
+@router.get("/", response_model=List[CreateSignUpRes])
+def get_all_signup(session: SessionDep):
+    signup_details = user_profile_crud.get_all_users(session=session)
+    return [to_signup_res(s) for s in signup_details]
+
+
+@router.post("/sign_in", response_model=SigninResponse)
 def sign_in(session: SessionDep, signin_req: SigninRequest):
     signin_req.email = signin_req.email.strip()
     signin_req.password = signin_req.password.strip()
@@ -94,7 +106,7 @@ def sign_in(session: SessionDep, signin_req: SigninRequest):
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content="Successfully signed in"
+        content=to_signin_res(user)
     )
 
 
